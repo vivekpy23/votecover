@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Book Covers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-content: center;
+        }
+        .book {
+            margin: 20px 0;
+            text-align: center;
+        }
+        img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        #fullImageModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        #fullImageModal img {
+            width: auto;
+            height: auto;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        #closeModal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        #nameModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        #nameModalContent {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function showNameModal() {
+            const modal = document.getElementById('nameModal');
+            modal.style.display = 'flex';
+        }
+
+        function submitName() {
+            const nameInput = document.getElementById('nameInput');
+            if (nameInput.value.trim() === '') {
+                alert('Please enter your name.');
+                return;
+            }
+            const modal = document.getElementById('nameModal');
+            modal.style.display = 'none';
+            document.getElementById('nameField').value = nameInput.value;
+            document.getElementById('ratingForm').submit();
+        }
+
+        function openFullImage(src) {
+            const modal = document.getElementById('fullImageModal');
+            const modalImage = modal.querySelector('img');
+            modalImage.src = src;
+            modal.style.display = 'flex';
+        }
+
+        function closeFullImage() {
+            const modal = document.getElementById('fullImageModal');
+            modal.style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div id="fullImageModal">
+        <button id="closeModal" onclick="closeFullImage()">&times;</button>
+        <img src="" alt="Full Size Image">
+    </div>
+    <div id="nameModal">
+        <div id="nameModalContent">
+            <h2>Enter Your Name</h2>
+            <input type="text" id="nameInput" placeholder="Your Name">
+            <button onclick="submitName()">Submit</button>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Rate These Book Covers</h1>
+        <form id="ratingForm" method="POST" action="/submit">
+            <div class="grid">
+                {% for cover in covers %}
+                <div class="book">
+                    <img src="{{ url_for('static', filename='covers/' ~ cover[1]) }}" alt="Book {{ cover[0] }}" onclick="openFullImage(this.src)">
+                    <div style="height: 1em;"></div>
+                    <label for="{{ cover }}">Rate: </label>
+                    <select id="{{ cover }}" name="{{ cover }}">
+                        <option value="">Select</option>
+                        <option value="0">Did not like it</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+            <input type="hidden" id="nameField" name="name">
+            <button type="button" onclick="showNameModal()">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
